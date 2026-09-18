@@ -1,0 +1,80 @@
+# Render Blueprint for Aarogya backend
+# =====================================
+# Deploy with zero manual configuration:
+#   1. Push this repo to GitHub.
+#   2. In the Render dashboard: New -> Blueprint -> pick the repo.
+#   3. Render provisions the database + web service and injects
+#      all environment variables automatically (including a
+#      generated VAPID keypair and a JWT secret).
+#
+# The frontend is deployed separately on Vercel using vercel.json
+# in the frontend/ folder (or via the Vercel dashboard: import
+# repo, set root directory to "frontend").
+
+databases:
+  - name: aarogya-db
+    databaseName: aarogya
+    user: aarogya
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  # ------------------------------------------------------------
+  # FastAPI backend
+  # ------------------------------------------------------------
+  - type: web
+    name: aarogya-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: |
+      python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # --- Render-provided ---
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aarogya-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+
+      # --- Auto-generated at provision time ---
+      - key: JWT_SECRET
+        generateValue: true
+
+      # --- VAPID keys for web push (generated once, stable) ---
+      - key: VAPID_PUBLIC_KEY
+        generateValue: true
+      - key: VAPID_PRIVATE_KEY
+        generateValue: true
+      - key: VAPID_CLAIMS_EMAIL
+        value: mailto:admin@aarogya.app
+
+      # --- Set this after the Vercel deployment exists ---
+      # (Render syncs it via the Vercel->Render instructions in
+      #  DEPLOYMENT_CHECKLIST.md; localhost + "*" fallbacks below
+      #  keep the very first deploy working without it.)
+      - key: FRONTEND_URL
+        value: http://localhost:3000
+      - key: CORS_ORIGINS
+        value: "*"
+
+      # --- Cluster detection defaults ---
+      - key: DEFAULT_CLUSTER_THRESHOLD
+        value: "3"
+      - key: DEFAULT_WINDOW_HOURS
+        value: "24"
+
+      # --- App ---
+      - key: ENVIRONMENT
+        value: production
+      - key: APP_NAME
+        value: Aarogya
+
+      # Demo emails are printed by app.seed; the seed script is
+      # idempotent, so restarts never duplicate data.
