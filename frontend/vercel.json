@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/backend/:path*",
+      "destination": "https://aarogya-api.onrender.com/:path*"
+    }
+  ]
+}

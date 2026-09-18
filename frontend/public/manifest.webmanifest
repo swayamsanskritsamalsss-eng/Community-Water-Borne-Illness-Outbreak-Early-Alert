@@ -1,0 +1,20 @@
+{
+  "name": "Aarogya - Community Early Warning",
+  "short_name": "Aarogya",
+  "description": "Community health early warning system for possible illness clusters.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
+  "theme_color": "#078dbb",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
