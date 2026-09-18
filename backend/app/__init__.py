@@ -1,0 +1,3 @@
+"""
+Aarogya backend application.
+"""

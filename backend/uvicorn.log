@@ -1,0 +1,78 @@
+INFO:     Started server process [11976]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58097 - "GET /alerts/push-public-key HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58099 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58101 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58103 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58105 - "GET /admin/users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58107 - "GET /alerts HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58109 - "POST /reports HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58111 - "POST /auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58113 - "POST /auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58115 - "POST /auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58117 - "POST /auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58119 - "POST /auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58096 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58121 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58123 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58125 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58127 - "GET /auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58129 - "GET /admin/users HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:58131 - "GET /admin/users HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:58133 - "GET /admin/settings HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:58135 - "PUT /admin/settings HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:58137 - "POST /admin/users HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:58139 - "GET /alerts HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:58141 - "GET /dashboard/authority HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:58143 - "GET /admin/villages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58145 - "GET /admin/villages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58148 - "GET /admin/villages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58152 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58153 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58156 - "GET /admin/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58158 - "GET /admin/villages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58161 - "POST /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53696 - "POST /reports HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:53698 - "POST /reports HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53700 - "POST /reports HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:53702 - "GET /reports/chw-dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53704 - "GET /reports/my HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53706 - "POST /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53708 - "POST /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53710 - "POST /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53712 - "GET /dashboard/authority HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53714 - "POST /reports HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53716 - "GET /dashboard/authority HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58155 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53718 - "POST /alerts/fcda0511-ea3a-4b37-94a5-b7f03d22f69f/acknowledge HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53720 - "GET /alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53723 - "POST /alerts/fcda0511-ea3a-4b37-94a5-b7f03d22f69f/acknowledge HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:53725 - "POST /alerts/fcda0511-ea3a-4b37-94a5-b7f03d22f69f/resolve HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53727 - "POST /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53729 - "PATCH /admin/users/6a307ee4-5122-4f73-a634-c0aa723a0a79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53731 - "POST /auth/login HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:53733 - "PATCH /admin/users/6a307ee4-5122-4f73-a634-c0aa723a0a79 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53735 - "PUT /admin/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53737 - "GET /admin/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53739 - "PUT /admin/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53741 - "PUT /admin/settings HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:53743 - "GET /alerts/push-public-key HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53746 - "POST /auth/logout HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53749 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53750 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56477 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56478 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53044 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53045 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65494 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65495 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56409 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56410 - "OPTIONS /dashboard/authority HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56410 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56419 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56420 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56224 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56225 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56229 - "GET /dashboard/authority HTTP/1.1" 404 Not Found
