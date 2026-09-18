@@ -42,7 +42,6 @@ services:
           property: connectionString
       - key: PYTHON_VERSION
         value: "3.11.9"
-
       # --- Auto-generated at provision time ---
       - key: JWT_SECRET
         generateValue: true

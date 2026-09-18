@@ -4,8 +4,11 @@
 
 - [ ] Python 3.11+, install `backend/requirements.txt`
 - [ ] Set environment variables:
+  - [ ] `PYTHON_VERSION` — `3.11.9` (REQUIRED on Render: the default
+        Python 3.14 cannot build pydantic-core from source)
   - [ ] `DATABASE_URL` — Supabase/PostgreSQL connection string
-        (`postgresql+psycopg://...`)
+        (any format works: `postgres://`, `postgresql://`,
+        `postgresql+psycopg://` — the app normalizes automatically)
   - [ ] `JWT_SECRET` — long random value (NOT the default)
   - [ ] `FRONTEND_URL` — production frontend URL (CORS allow-list)
   - [ ] `ENVIRONMENT=production`
