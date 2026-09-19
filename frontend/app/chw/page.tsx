@@ -3,6 +3,7 @@
 import {
   FormEvent,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -11,9 +12,11 @@ import Shell from "../../components/Shell";
 
 import {
   ChwDashboard,
+  compressImage,
   getChwDashboard,
   getMyReports,
   getVillages,
+  reportPhotoUrl,
   Report,
   submitReport,
   Village,
@@ -49,6 +52,39 @@ function ChwDashboardContent() {
   const [symptomOther, setSymptomOther] = useState("");
   const [waterSource, setWaterSource] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Photo state: raw file for re-compression + preview URL.
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoProcessing, setPhotoProcessing] = useState(false);
+
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+
+  function handlePhotoSelected(file: File | undefined | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setSubmitError("The selected file is not an image.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setSubmitError("Image is too large (max 10 MB before compression).");
+      return;
+    }
+    setSubmitError("");
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  }
+
+  function handleRemovePhoto() {
+    setPhotoFile(null);
+    if (photoPreview) {
+      URL.revokeObjectURL(photoPreview);
+    }
+    setPhotoPreview(null);
+    if (photoInputRef.current) photoInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
+  }
 
   const [occurredAt, setOccurredAt] = useState(() => {
     const now = new Date();
@@ -111,11 +147,31 @@ function ChwDashboardContent() {
         );
       }
 
+      let photoBase64: string | undefined;
+      let photoMime: string | undefined;
+
+      if (photoFile) {
+        try {
+          setPhotoProcessing(true);
+          const compressed = await compressImage(photoFile);
+          photoBase64 = compressed.base64;
+          photoMime = compressed.mime;
+        } catch {
+          throw new Error(
+            "Could not process the photo. Try a different image."
+          );
+        } finally {
+          setPhotoProcessing(false);
+        }
+      }
+
       await submitReport({
         village_id: villageId,
         symptom: finalSymptom,
         water_source: waterSource.trim() || undefined,
         notes: notes.trim() || undefined,
+        photo_base64: photoBase64,
+        photo_mime: photoMime,
         occurred_at: new Date(occurredAt).toISOString(),
       });
 
@@ -123,6 +179,7 @@ function ChwDashboardContent() {
       setWaterSource("");
       setNotes("");
       setSymptomOther("");
+      handleRemovePhoto();
       await loadData();
     } catch (err: any) {
       setSubmitError(
@@ -130,6 +187,7 @@ function ChwDashboardContent() {
       );
     } finally {
       setSubmitting(false);
+      setPhotoProcessing(false);
     }
   }
 
@@ -318,12 +376,76 @@ function ChwDashboardContent() {
               />
             </div>
 
+            <div>
+              <label className="form-label">Photo (optional)</label>
+
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handlePhotoSelected(e.target.files?.[0])}
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => handlePhotoSelected(e.target.files?.[0])}
+              />
+
+              {!photoPreview ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    className="btn-secondary py-3"
+                    onClick={() => cameraInputRef.current?.click()}
+                  >
+                    📷 Take photo
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary py-3"
+                    onClick={() => photoInputRef.current?.click()}
+                  >
+                    🖼️ Upload
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-slate-200 p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photoPreview}
+                    alt="Selected situation"
+                    className="max-h-56 w-full rounded-lg object-cover"
+                  />
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <p className="text-xs text-slate-500">
+                      {photoFile?.name} — compressed automatically on submit
+                    </p>
+                    <button
+                      type="button"
+                      className="btn-danger px-3 py-2 text-sm"
+                      onClick={handleRemovePhoto}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               className="btn-primary w-full py-3"
-              disabled={submitting}
+              disabled={submitting || photoProcessing}
             >
-              {submitting ? "Submitting..." : "Submit report"}
+              {submitting
+                ? "Submitting..."
+                : photoProcessing
+                  ? "Processing photo..."
+                  : "Submit report"}
             </button>
 
           </form>
@@ -366,12 +488,28 @@ function ChwDashboardContent() {
                     <span className="shrink-0 text-xs text-slate-400">
                       {new Date(report.occurred_at).toLocaleString()}
                     </span>
-                  </div>
-                  {report.notes && (
-                    <p className="mt-2 text-sm leading-5 text-slate-600">
-                      {report.notes}
-                    </p>
-                  )}
+                  </div>                  {report.notes && (
+                      <p className="mt-2 text-sm leading-5 text-slate-600">
+                        {report.notes}
+                      </p>
+                    )}
+
+                    {report.has_photo && (
+                      <a
+                        href={reportPhotoUrl(report.id)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 block"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={reportPhotoUrl(report.id)}
+                          alt={`Photo for ${report.symptom} report`}
+                          className="h-28 w-full rounded-lg border border-slate-200 object-cover"
+                          loading="lazy"
+                        />
+                      </a>
+                    )}
                 </div>
               ))}
             </div>

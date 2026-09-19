@@ -12,6 +12,7 @@ import Shell from "../../components/Shell";
 import {
   AuthorityDashboard,
   getAuthorityDashboard,
+  reportPhotoUrl,
 } from "../../lib/api";
 
 
@@ -327,6 +328,10 @@ function AuthorityDashboardContent() {
                       </th>
 
                       <th>
+                        Photo
+                      </th>
+
+                      <th>
                         Time
                       </th>
 
@@ -355,6 +360,30 @@ function AuthorityDashboardContent() {
                           <td>
                             {report.water_source ||
                               "—"}
+                          </td>
+
+                          <td>
+                            {report.has_photo ? (
+                              <a
+                                href={reportPhotoUrl(
+                                  report.id
+                                )}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={reportPhotoUrl(
+                                    report.id
+                                  )}
+                                  alt="Report photo"
+                                  className="h-10 w-14 rounded border border-slate-200 object-cover"
+                                  loading="lazy"
+                                />
+                              </a>
+                            ) : (
+                              "—"
+                            )}
                           </td>
 
                           <td>

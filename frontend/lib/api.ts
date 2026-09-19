@@ -20,11 +20,15 @@ const isLocalhost =
   isBrowser &&
   window.location.hostname === "localhost";
 
-const API_URL =
+const RAW_API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   (isBrowser && !isLocalhost
     ? "/backend"
     : "http://localhost:8000");
+
+// Guard against a trailing slash in the env var, which would
+// produce requests like "//auth/login" (404).
+const API_URL = RAW_API_URL.replace(/\/+$/, "");
 
 
 export class ApiError extends Error {
@@ -174,8 +178,76 @@ export interface Report {
   symptom: string;
   water_source: string | null;
   notes: string | null;
+  has_photo: boolean;
   occurred_at: string;
   created_at: string;
+}
+
+
+/**
+ * Resize + compress an image file in the browser (canvas), then
+ * return base64 (no data: prefix) and the mime type. Keeps uploads
+ * small (~50-200 KB typical) so they can be stored in the database
+ * without external object storage.
+ */
+export async function compressImage(
+  file: File,
+  maxSize = 1024,
+  quality = 0.7
+): Promise<{ base64: string; mime: string }> {
+  const dataUrl = await new Promise<string>(
+    (resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Could not read the image file."));
+      reader.readAsDataURL(file);
+    }
+  );
+
+  const img = await new Promise<HTMLImageElement>(
+    (resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Unsupported image format."));
+      image.src = dataUrl;
+    }
+  );
+
+  const scale = Math.min(
+    1,
+    maxSize / Math.max(img.width, img.height)
+  );
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(img.width * scale));
+  canvas.height = Math.max(1, Math.round(img.height * scale));
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Canvas not supported in this browser.");
+  }
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  const out = canvas.toDataURL("image/jpeg", quality);
+  // dataUrl = "data:image/jpeg;base64,<payload>"
+  const base64 = out.slice(out.indexOf(",") + 1);
+
+  return { base64, mime: "image/jpeg" };
+}
+
+
+/**
+ * URL of the photo endpoint for a report (used as <img src>).
+ */
+export function reportPhotoUrl(
+  reportId: string
+): string {
+  const token = getSessionToken();
+  // The <img> tag cannot send Authorization headers, so the token
+  // rides in the query string; the backend accepts either.
+  return `${API_URL}/reports/${reportId}/photo?token=${encodeURIComponent(
+    token || ""
+  )}`;
 }
 
 
@@ -192,6 +264,8 @@ export async function submitReport(
     symptom: string;
     water_source?: string;
     notes?: string;
+    photo_base64?: string;
+    photo_mime?: string;
     occurred_at: string;
   }
 ) {
@@ -287,6 +361,7 @@ export interface AuthorityDashboard {
     village_name: string;
     symptom: string;
     water_source: string | null;
+    has_photo: boolean;
     occurred_at: string;
   }[];
 
