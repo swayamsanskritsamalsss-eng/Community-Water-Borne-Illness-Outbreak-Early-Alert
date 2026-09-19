@@ -141,6 +141,7 @@ def authority_dashboard(
                 village_name=report.village.name,
                 symptom=report.symptom,
                 water_source=report.water_source,
+                has_photo=bool(report.photo_base64),
                 occurred_at=report.occurred_at,
             )
             for report in recent_reports

@@ -165,6 +165,7 @@ class RecentReport(BaseModel):
     village_name: str
     symptom: str
     water_source: Optional[str]
+    has_photo: bool = False
     occurred_at: datetime
 
 
