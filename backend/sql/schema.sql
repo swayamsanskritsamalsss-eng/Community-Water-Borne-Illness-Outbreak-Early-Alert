@@ -75,6 +75,10 @@ CREATE TABLE IF NOT EXISTS reports (
 
     notes TEXT,
 
+    photo_base64 TEXT,
+
+    photo_mime VARCHAR(50),
+
     occurred_at TIMESTAMPTZ NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

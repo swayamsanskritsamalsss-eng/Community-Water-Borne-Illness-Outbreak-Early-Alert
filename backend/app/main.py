@@ -12,6 +12,27 @@ from app.db.session import Base, engine
 Base.metadata.create_all(bind=engine)
 
 
+# Lightweight startup migration: add columns that were introduced
+# after a database was already provisioned (e.g. the production
+# Supabase DB created before the photo upload feature). Idempotent.
+from sqlalchemy import text  # noqa: E402
+
+
+with engine.connect() as conn:
+    for statement in (
+        "ALTER TABLE reports ADD COLUMN IF NOT EXISTS photo_base64 TEXT",
+        "ALTER TABLE reports ADD COLUMN IF NOT EXISTS photo_mime VARCHAR(50)",
+    ):
+        try:
+            conn.execute(text(statement))
+        except Exception:
+            # SQLite (local demo) lacks IF NOT EXISTS on ADD COLUMN;
+            # the columns already exist there, so failing statements
+            # are safely ignored.
+            pass
+    conn.commit()
+
+
 app = FastAPI(
     title="Aarogya API",
     description=(

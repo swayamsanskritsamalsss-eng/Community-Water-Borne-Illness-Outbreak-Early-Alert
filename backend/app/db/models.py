@@ -217,6 +217,19 @@ class Report(Base):
         nullable=True,
     )
 
+    # Optional photo of the situation, captured by the CHW.
+    # Stored as raw base64 (no data: prefix) + mime type so the
+    # demo needs no external object storage.
+    photo_base64 = Column(
+        Text,
+        nullable=True,
+    )
+
+    photo_mime = Column(
+        String(50),
+        nullable=True,
+    )
+
     occurred_at = Column(
         DateTime(timezone=True),
         nullable=False,

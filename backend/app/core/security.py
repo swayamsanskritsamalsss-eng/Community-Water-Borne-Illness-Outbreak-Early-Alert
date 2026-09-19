@@ -106,14 +106,27 @@ def get_current_user_id(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(
         bearer_scheme
     ),
+    token: Optional[str] = None,
 ) -> str:
+    """
+    Resolve the JWT from (in priority order):
+      1. The Authorization: Bearer header (normal API calls).
+      2. The ?token= query parameter (for <img src> requests,
+         which cannot set custom headers).
+    """
 
-    if not credentials:
+    raw_token = (
+        credentials.credentials
+        if credentials
+        else token
+    )
+
+    if not raw_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required.",
         )
 
-    payload = decode_access_token(credentials.credentials)
+    payload = decode_access_token(raw_token)
 
     return payload["sub"]

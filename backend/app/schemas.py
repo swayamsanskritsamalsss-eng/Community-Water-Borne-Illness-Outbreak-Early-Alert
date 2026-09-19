@@ -47,6 +47,16 @@ class ReportCreate(BaseModel):
         default=None,
         max_length=1000,
     )
+    # Optional photo, base64-encoded by the browser (the client
+    # compresses/resizes before upload; ~500 KB limit enforced here).
+    photo_base64: Optional[str] = Field(
+        default=None,
+        max_length=700_000,
+    )
+    photo_mime: Optional[str] = Field(
+        default=None,
+        max_length=50,
+    )
     occurred_at: datetime
 
 
@@ -57,6 +67,9 @@ class ReportResponse(BaseModel):
     symptom: str
     water_source: Optional[str]
     notes: Optional[str]
+    # photo_base64 is intentionally EXCLUDED from list responses to
+    # keep payloads small; clients fetch the image via /reports/{id}/photo.
+    has_photo: bool = False
     occurred_at: datetime
     created_at: datetime
 
