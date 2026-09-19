@@ -16,6 +16,76 @@ import {
 } from "../../lib/api";
 
 
+/**
+ * Full-screen photo viewer. Any report with a photo can be opened
+ * by clicking its thumbnail; Escape or the close button dismisses it.
+ */
+function PhotoViewer({
+  reportId,
+  villageName,
+  symptom,
+  onClose,
+}: {
+  reportId: string;
+  villageName: string;
+  symptom: string;
+  onClose: () => void;
+}) {
+
+  useEffect(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", handleKey);
+    return () =>
+      window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-full w-full max-w-3xl overflow-auto rounded-2xl bg-white p-4 shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="mb-3 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-lg font-extrabold text-slate-900">
+              {symptom}
+            </p>
+            <p className="text-sm text-slate-500">
+              {villageName}
+            </p>
+          </div>
+          <button
+            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+            onClick={onClose}
+            aria-label="Close photo"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={reportPhotoUrl(reportId)}
+          alt={`Photo for ${symptom} report in ${villageName}`}
+          className="max-h-[70vh] w-full rounded-xl object-contain"
+        />
+
+        <p className="mt-3 text-center text-xs text-slate-400">
+          Click outside or press Escape to close
+        </p>
+      </div>
+    </div>
+  );
+}
+
+
 function AuthorityDashboardContent() {
 
   const [
@@ -30,6 +100,16 @@ function AuthorityDashboardContent() {
     loading,
     setLoading,
   ] = useState(true);
+
+  // Currently opened photo viewer
+  const [
+    viewingPhoto,
+    setViewingPhoto,
+  ] = useState<{
+    reportId: string;
+    villageName: string;
+    symptom: string;
+  } | null>(null);
 
 
   const [
@@ -347,6 +427,29 @@ function AuthorityDashboardContent() {
 
                         <tr
                           key={report.id}
+                          className={
+                            report.has_photo
+                              ? "cursor-pointer"
+                              : undefined
+                          }
+                          onClick={
+                            report.has_photo
+                              ? () =>
+                                  setViewingPhoto({
+                                    reportId:
+                                      report.id,
+                                    villageName:
+                                      report.village_name,
+                                    symptom:
+                                      report.symptom,
+                                  })
+                              : undefined
+                          }
+                          title={
+                            report.has_photo
+                              ? "Click to view photo"
+                              : undefined
+                          }
                         >
 
                           <td className="font-semibold">
@@ -364,23 +467,15 @@ function AuthorityDashboardContent() {
 
                           <td>
                             {report.has_photo ? (
-                              <a
-                                href={reportPhotoUrl(
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={reportPhotoUrl(
                                   report.id
                                 )}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={reportPhotoUrl(
-                                    report.id
-                                  )}
-                                  alt="Report photo"
-                                  className="h-10 w-14 rounded border border-slate-200 object-cover"
-                                  loading="lazy"
-                                />
-                              </a>
+                                alt="Report photo thumbnail"
+                                className="h-10 w-14 rounded border border-slate-200 object-cover"
+                                loading="lazy"
+                              />
                             ) : (
                               "—"
                             )}
@@ -594,6 +689,16 @@ function AuthorityDashboardContent() {
         </section>
 
       </div>
+
+      {viewingPhoto && (
+        <PhotoViewer
+          reportId={viewingPhoto.reportId}
+          villageName={viewingPhoto.villageName}
+          symptom={viewingPhoto.symptom}
+          onClose={() => setViewingPhoto(null)}
+        />
+      )}
+
     </>
   );
 }
